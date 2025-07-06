@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Library</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+    header {
+      background-color: #2d3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2d3e50;
+    }
+    form {
+      margin-top: 30px;
+    }
+    label, p {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="tel"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button, .toggle-btn {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .toggle-btn {
+      background-color: #007BFF;
+    }
+    button:hover, .toggle-btn:hover {
+      opacity: 0.9;
+    }
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .book-card {
+      background-color: #fafafa;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+    .book-card:hover {
+      transform: scale(1.03);
+    }
+    .book-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+    .book-info {
+      padding: 15px;
+    }
+    .book-info h4 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+    .book-info a {
+      color: #007BFF;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .book-info p {
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    footer {
+      margin-top: 60px;
+      background-color: #2d3e50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Campus Library</h1>
+    <p>Borrow books and view our collection</p>
+  </header>
+
+  <div class="container">
+    <h2>Borrow a Book</h2>
+    <form id="borrowForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required>
+      <label for="studentId">Student Number</label>
+      <input type="text" id="studentId" required>
+      <label for="contact">Contact Number</label>
+      <input type="tel" id="contact" required>
+      <label for="yearLevel">Year Level</label>
+      <select id="yearLevel" required>
+        <option value="">-- Select Year Level --</option>
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+        <option value="4th Year">4th Year</option>
+      </select>
+      <label for="bookSelect">Select a Book</label>
+      <select id="bookSelect" required></select>
+      <label for="borrowDate">Borrow Date</label>
+      <input type="date" id="borrowDate" required>
+      <label for="returnDate">Return Date</label>
+      <input type="date" id="returnDate" required>
+      <p>I agree to return the book on or before the return date.</p>
+      <label><input type="radio" name="agree" value="yes" required> Yes</label>
+      <label><input type="radio" name="agree" value="no"> No</label>
+      <button type="submit">Submit Request</button>
+    </form>
+
+    <h2>Book Collection</h2>
+    <div class="book-grid" id="bookList"></div>
+
+    <button class="toggle-btn" onclick="toggleTable()">Show Borrowed Books</button>
+
+    <div id="borrowedTableSection" style="display: none;">
+      <h2>Borrowed Books Log</h2>
+      <table id="borrowedTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Student #</th>
+            <th>Contact</th>
+            <th>Year Level</th>
+            <th>Book</th>
+            <th>Borrow Date</th>
+            <th>Return Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Campus Library. All rights reserved.
+  </footer>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyCVGNYfXoY_LwSIFDG-8hebiXXC6vrChkKDx0k5FGvIat750SnyegDKqPd3N3vsKYQ/exec";
+
+    const books = [
+      {
+        title: "The Great Gatsby",
+        img: "https://covers.openlibrary.org/b/id/7222246-L.jpg",
+        link: "https://openlibrary.org/works/OL276522W/The_Great_Gatsby"
+      },
+      {
+        title: "1984 by George Orwell",
+        img: "https://covers.openlibrary.org/b/id/7222241-L.jpg",
+        link: "https://openlibrary.org/works/OL7343629W/Nineteen_Eighty-Four"
+      },
+      {
+        title: "To Kill a Mockingbird",
+        img: "https://covers.openlibrary.org/b/id/8225265-L.jpg",
+        link: "https://openlibrary.org/works/OL82563W/To_Kill_a_Mockingbird"
+      },
+      {
+        title: "Pride and Prejudice",
+        img: "https://covers.openlibrary.org/b/id/8091016-L.jpg",
+        link: "https://openlibrary.org/works/OL14986706W/Pride_and_Prejudice"
+      }
+    ];
+
+    let borrowedBooks = [];
+
+    function fetchBorrowedBooks() {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          borrowedBooks = data;
+          populateTable();
+          generateBookCards();
+          populateBookDropdown();
+        });
+    }
+
+    function isBookCurrentlyBorrowed(bookTitle) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return borrowedBooks.some(entry => {
+        if (entry["Book Title"] !== bookTitle) return false;
+        const borrowDate = new Date(entry["Borrow Date"]);
+        const returnDate = new Date(entry["Return Date"]);
+        borrowDate.setHours(0, 0, 0, 0);
+        returnDate.setHours(0, 0, 0, 0);
+        return today >= borrowDate && today <= returnDate;
+      });
+    }
+
+    function generateBookCards() {
+      const bookList = document.getElementById("bookList");
+      bookList.innerHTML = "";
+      books.forEach(book => {
+        const isBorrowed = isBookCurrentlyBorrowed(book.title);
+        const card = document.createElement("div");
+        card.className = "book-card";
+        card.innerHTML = `
+          <img src="${book.img}" alt="${book.title}">
+          <div class="book-info">
+            <h4>${book.title}</h4>
+            <a href="${book.link}" target="_blank">Preview Book</a>
+            ${isBorrowed ? '<p style="color: red; font-weight: bold;">Currently Borrowed</p>' : ''}
+          </div>
+        `;
+        bookList.appendChild(card);
+      });
+    }
+
+    function populateBookDropdown() {
+      const bookSelect = document.getElementById("bookSelect");
+      bookSelect.innerHTML = "";
+      books.forEach(book => {
+        const isBorrowed = isBookCurrentlyBorrowed(book.title);
+        const option = document.createElement("option");
+        option.value = book.title;
+        option.textContent = book.title;
+        if (isBorrowed) option.disabled = true;
+        bookSelect.appendChild(option);
+      });
+    }
+
+    function populateTable() {
+      const tbody = document.querySelector("#borrowedTable tbody");
+      tbody.innerHTML = "";
+      borrowedBooks.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.Name}</td>
+          <td>${entry["Student ID"]}</td>
+          <td>${entry.Contact}</td>
+          <td>${entry["Year Level"]}</td>
+          <td>${entry["Book Title"]}</td>
+          <td>${entry["Borrow Date"]}</td>
+          <td>${entry["Return Date"]}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function toggleTable() {
+      const section = document.getElementById("borrowedTableSection");
+      section.style.display = section.style.display === "none" ? "block" : "none";
+    }
+
+    document.getElementById("borrowForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const studentId = document.getElementById("studentId").value;
+      const contact = document.getElementById("contact").value;
+      const yearLevel = document.getElementById("yearLevel").value;
+      const book = document.getElementById("bookSelect").value;
+      const borrowDate = document.getElementById("borrowDate").value;
+      const returnDate = document.getElementById("returnDate").value;
+      const agree = document.querySelector('input[name="agree"]:checked');
+
+      if (!agree || agree.value !== "yes") {
+        alert("You must agree to return the book.");
+        return;
+      }
+
+      if (isBookCurrentlyBorrowed(book)) {
+        alert("This book is currently being borrowed. Please select another.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("studentId", studentId);
+      formData.append("contact", contact);
+      formData.append("yearLevel", yearLevel);
+      formData.append("book", book);
+      formData.append("borrowDate", borrowDate);
+      formData.append("returnDate", returnDate);
+      formData.append("agree", agree.value);
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.text())
+      .then(() => {
+        alert("Book successfully borrowed!");
+        fetchBorrowedBooks(); // reload data
+        document.getElementById("borrowForm").reset();
+      })
+      .catch(err => {
+        console.error(err);
+        alert("There was an error submitting the form.");
+      });
+    });
+
+    fetchBorrowedBooks(); // Load on page load
+  </script>
+</body>
+</html>
