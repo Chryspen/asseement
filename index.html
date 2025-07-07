@@ -331,7 +331,7 @@
       .then(res => res.text())
       .then(() => {
         alert("Book successfully borrowed!");
-        fetchBorrowedBooks(); // reload data
+        fetchBorrowedBooks();
         document.getElementById("borrowForm").reset();
       })
       .catch(err => {
@@ -340,7 +340,7 @@
       });
     });
 
-    fetchBorrowedBooks(); // Load on page load
+    fetchBorrowedBooks();
   </script>
 </body>
 </html>
